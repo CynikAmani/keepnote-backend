@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 
-class Note extends Model
+class TodoGroup extends Model
 {
     use SoftDeletes;
 
@@ -14,26 +13,17 @@ class Note extends Model
         'user_id',
         'label_id',
         'title',
-        'content',
         'color',
         'is_pinned',
         'is_archived',
     ];
 
+    
     /**
-     * Eager load lightweight relations
+     * Enable Eager Loading
      */
-    protected $with = ['label'];
+    protected $with = ['todoItems'];
 
-    /**
-     * Global Scope
-     */
-    protected static function booted()
-    {
-        static::addGlobalScope('active', function (Builder $builder) {
-            $builder->where('is_archived', false);
-        });
-    }
 
     /**
      * Relationships
@@ -48,6 +38,11 @@ class Note extends Model
         return $this->belongsTo(Label::class);
     }
 
+    public function todoItems()
+    {
+        return $this->hasMany(TodoItem::class)->orderBy('position');
+    }
+
     /**
      * Local Scopes
      */
@@ -56,10 +51,19 @@ class Note extends Model
         return $query->where('user_id', $userId);
     }
 
+    public function scopeUnpinned($query)
+    {
+        return $query->where('is_pinned', false);
+    }
+
     public function scopeArchived($query)
     {
-        return $query->withoutGlobalScope('active')
-                     ->where('is_archived', true);
+        return $query->where('is_archived', true);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_archived', false);
     }
 
     /**
@@ -70,17 +74,17 @@ class Note extends Model
         return strtolower($value);
     }
 
+    public function getIsEmptyAttribute()
+    {
+        return $this->todoItems()->count() === 0;
+    }
+
     /**
      * Mutators
      */
     public function setTitleAttribute($value)
     {
         $this->attributes['title'] = trim($value);
-    }
-
-    public function setContentAttribute($value)
-    {
-        $this->attributes['content'] = $value ? trim($value) : null;
     }
 
     public function setColorAttribute($value)
