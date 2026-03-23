@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\UserService;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\StoreUserRequest; // <-- For creating new user
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -28,9 +29,15 @@ class UserController extends Controller
         return new UserResource($this->userService->findUser($id));
     }
 
+    public function store(StoreUserRequest $request): UserResource
+    {
+        $user = $this->userService->createUser($request->validated());
+
+        return new UserResource($user);
+    }
+
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
-        // Validation and Authorization are handled automatically by UpdateUserRequest
         $updatedUser = $this->userService->updateUser($user, $request->validated());
 
         return new UserResource($updatedUser);
@@ -38,11 +45,6 @@ class UserController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
-        // Check permission via the model method
-        if (!auth()->user()->hasPermission('delete-user')) {
-            abort(403);
-        }
-
         $this->userService->deleteUser($user);
 
         return response()->json(['message' => 'User deleted successfully.']);

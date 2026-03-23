@@ -19,6 +19,24 @@ class UserService
         return User::with(['roles.permissions'])->findOrFail($id);
     }
 
+    public function createUser(array $data): User
+    {
+        // Hash password if provided
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        // Create user
+        $user = User::create($data);
+
+        // Sync roles if provided
+        if (isset($data['roles'])) {
+            $user->roles()->sync($data['roles']);
+        }
+
+        return $user->load(['roles.permissions']); // Load roles and permissions for API response
+    }
+
     public function updateUser(User $user, array $data): User
     {
         // Handle Password Update
@@ -35,7 +53,7 @@ class UserService
             $user->roles()->sync($data['roles']);
         }
 
-        return $user->load(['roles.permissions']); //Lazy load: fresh roles and permissions after update incase they were changed
+        return $user->load(['roles.permissions']); // Lazy load: fresh roles and permissions after update
     }
 
     public function deleteUser(User $user): bool
