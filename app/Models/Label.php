@@ -11,13 +11,6 @@ class Label extends Model
         'name',
     ];
 
-
-    /**
-     * Eager Loading
-     */
-    protected $with = ['notes', 'todoGroups'];
-
-
     /**
      * Relationships
      */
