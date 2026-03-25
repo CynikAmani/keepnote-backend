@@ -56,11 +56,20 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
     // --- Notes ---
     Route::prefix('notes')->group(function () {
         Route::get('/', [NoteController::class, 'index'])->middleware('permission:view-notes');
+        Route::get('/archived', [NoteController::class, 'archived'])->middleware('permission:view-notes');
         Route::get('/{note}', [NoteController::class, 'show'])->middleware('permission:view-notes');
+    
         Route::post('/', [NoteController::class, 'store'])->middleware('permission:create-note');
+    
         Route::put('/{note}', [NoteController::class, 'update'])->middleware('permission:update-note');
+    
+        Route::patch('/{note}/pin', [NoteController::class, 'togglePin'])->middleware('permission:update-note');
+        Route::patch('/{note}/archive', [NoteController::class, 'archive'])->middleware('permission:update-note');
+        Route::patch('/{note}/unarchive', [NoteController::class, 'unarchive'])->middleware('permission:update-note');
+    
         Route::delete('/{note}', [NoteController::class, 'destroy'])->middleware('permission:delete-note');
     });
+
 
     // --- TodoGroups ---
     Route::prefix('todo-groups')->group(function () {
