@@ -40,7 +40,6 @@ class UserService
     {
         return Label::forUser($userId)
             ->with(['notes', 'todoGroups'])
-            ->withCount(['notes', 'todoGroups'])
             ->find($labelId);
     }
 

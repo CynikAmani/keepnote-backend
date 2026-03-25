@@ -20,12 +20,6 @@ class TodoGroup extends Model
 
     
     /**
-     * Enable Eager Loading
-     */
-    protected $with = ['todoItems'];
-
-
-    /**
      * Relationships
      */
     public function user()
