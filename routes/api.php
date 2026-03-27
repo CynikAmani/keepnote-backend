@@ -29,16 +29,23 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
     // --- Roles ---
     Route::prefix('roles')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->middleware('permission:view-roles');
-        Route::get('/{id}', [RoleController::class, 'show'])->middleware('permission:view-roles');
+        Route::get('/{role}', [RoleController::class, 'show'])->middleware('permission:view-roles');
         Route::post('/', [RoleController::class, 'store'])->middleware('permission:create-role');
         Route::put('/{role}', [RoleController::class, 'update'])->middleware('permission:update-role');
         Route::delete('/{role}', [RoleController::class, 'destroy'])->middleware('permission:delete-role');
+
+        // Role Permissions
+        Route::get('/{role}/permissions', [RolePermissionController::class, 'index'])->middleware('permission:view-role-permissions');
+        Route::post('/{role}/permissions', [RolePermissionController::class, 'assign'])->middleware('permission:update-role-permissions');
+        Route::put('/{role}/permissions', [RolePermissionController::class, 'sync'])->middleware('permission:update-role-permissions');
+        Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'revoke'])
+        ->middleware('permission:update-role-permissions');
     });
+
+    
 
     // --- Permissions ---
     Route::prefix('permissions')->group(function () {
-        Route::get('/', [PermissionController::class, 'index'])->middleware('permission:view-permissions');
-        Route::get('/{permission}', [PermissionController::class, 'show'])->middleware('permission:view-permissions');
         Route::post('/', [PermissionController::class, 'store'])->middleware('permission:create-permission');
         Route::put('/{permission}', [PermissionController::class, 'update'])->middleware('permission:update-permission');
         Route::delete('/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:delete-permission');
