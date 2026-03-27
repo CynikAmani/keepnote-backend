@@ -83,12 +83,12 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
     });
 
     // --- TodoItems ---
-    Route::prefix('todolist-items')->group(function () {
-        Route::get('/', [TodoItemController::class, 'index'])->middleware('permission:view-todo-items');
-        Route::get('/{item}', [TodoItemController::class, 'show'])->middleware('permission:view-todo-items');
+    Route::prefix('todo-items')->group(function () {
         Route::post('/', [TodoItemController::class, 'store'])->middleware('permission:create-todo-item');
-        Route::put('/{item}', [TodoItemController::class, 'update'])->middleware('permission:update-todo-item');
-        Route::delete('/{item}', [TodoItemController::class, 'destroy'])->middleware('permission:delete-todo-item');
+        Route::patch('/{todoItem}', [TodoItemController::class, 'update'])->middleware('permission:update-todo-item');
+        Route::delete('/{todoItem}', [TodoItemController::class, 'destroy'])->middleware('permission:delete-todo-item');
+        Route::patch('/{todoItem}/toggle', [TodoItemController::class, 'toggleCompletion'])->middleware('permission:update-todo-item');
+        Route::patch('/{todoItem}/position', [TodoItemController::class, 'updatePosition'])->middleware('permission:update-todo-item');
     });
 
 });
