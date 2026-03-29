@@ -24,6 +24,8 @@ class NoteController extends Controller
      */
     public function index(): ResourceCollection
     {
+        $this->authorize('viewAny', Note::class);
+
         $notes = $this->noteService->getUserNotes(auth()->id());
 
         return NoteResource::collection($notes);
@@ -34,6 +36,8 @@ class NoteController extends Controller
      */
     public function show(Note $note): NoteResource
     {
+        $this->authorize('view', $note);
+
         return new NoteResource($note);
     }
 
@@ -42,6 +46,8 @@ class NoteController extends Controller
      */
     public function store(StoreNoteRequest $request): NoteResource
     {
+        $this->authorize('create', Note::class);
+
         $note = $this->noteService->createNote(
             auth()->id(),
             $request->validated()
@@ -55,6 +61,8 @@ class NoteController extends Controller
      */
     public function update(UpdateNoteRequest $request, Note $note): NoteResource
     {
+        $this->authorize('update', $note);
+
         $note = $this->noteService->updateNote(
             $note,
             $request->validated()
@@ -68,6 +76,8 @@ class NoteController extends Controller
      */
     public function destroy(Note $note): JsonResponse
     {
+        $this->authorize('delete', $note);
+
         $this->noteService->deleteNote($note);
 
         return response()->json([
@@ -80,6 +90,8 @@ class NoteController extends Controller
      */
     public function archived(): ResourceCollection
     {
+        $this->authorize('viewAny', Note::class);
+
         $notes = $this->noteService->getArchivedNotes(auth()->id());
 
         return NoteResource::collection($notes);
@@ -90,6 +102,8 @@ class NoteController extends Controller
      */
     public function togglePin(Note $note): NoteResource
     {
+        $this->authorize('togglePin', $note);
+
         $note = $this->noteService->togglePinned($note);
 
         return new NoteResource($note);
@@ -100,6 +114,8 @@ class NoteController extends Controller
      */
     public function archive(Note $note): NoteResource
     {
+        $this->authorize('archive', $note);
+
         $note = $this->noteService->archiveNote($note);
 
         return new NoteResource($note);
@@ -110,6 +126,8 @@ class NoteController extends Controller
      */
     public function unarchive(Note $note): NoteResource
     {
+        $this->authorize('unarchive', $note);
+
         $note = $this->noteService->unarchiveNote($note);
 
         return new NoteResource($note);

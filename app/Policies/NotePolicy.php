@@ -15,7 +15,9 @@ class NotePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view-notes');
+        
+        //Service will filter notes by user_id, so any authenticated user can view their own notes
+        return true;  
     }
 
     /**
@@ -23,7 +25,7 @@ class NotePolicy
      */
     public function view(User $user, Note $note): bool
     {
-        return $user->hasPermissionTo('view-notes') && $note->user_id === $user->id;
+        return $note->user_id === $user->id;
     }
 
     /**
@@ -31,7 +33,7 @@ class NotePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create-note');
+        return true; // Any authenticated user can create notes
     }
 
     /**
@@ -39,7 +41,7 @@ class NotePolicy
      */
     public function update(User $user, Note $note): bool
     {
-        return $user->hasPermissionTo('update-note') && $note->user_id === $user->id;
+        return $note->user_id === $user->id;
     }
 
     /**
@@ -47,30 +49,30 @@ class NotePolicy
      */
     public function delete(User $user, Note $note): bool
     {
-        return $user->hasPermissionTo('delete-note') && $note->user_id === $user->id;
+        return $note->user_id === $user->id;
     }
 
     /**
-     * Determine whether the user can pin/unpin a note.
+     * Pin / Unpin note.
      */
     public function togglePin(User $user, Note $note): bool
     {
-        return $this->update($user, $note);
+        return $note->user_id === $user->id;
     }
 
     /**
-     * Determine whether the user can archive a note.
+     * Archive note.
      */
     public function archive(User $user, Note $note): bool
     {
-        return $this->update($user, $note);
+        return $note->user_id === $user->id;
     }
 
     /**
-     * Determine whether the user can unarchive a note.
+     * Restore archived note.
      */
     public function unarchive(User $user, Note $note): bool
     {
-        return $this->update($user, $note);
+        return $note->user_id === $user->id;
     }
 }
