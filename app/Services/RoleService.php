@@ -25,14 +25,6 @@ class RoleService
     }
 
     /**
-     * Delete a role.
-     */
-    public function deleteRole(Role $role): void
-    {
-        $role->delete();
-    }
-
-    /**
      * Retrieve all roles.
      */
     public function getAllRoles()
@@ -48,5 +40,13 @@ class RoleService
     public function getRole(Role $role): Role
     {
         return $role;
+    }
+
+    /**
+     * Delete a role.
+     */
+    public function deleteRole(Role $role): void
+    {
+        $role->delete();
     }
 }
