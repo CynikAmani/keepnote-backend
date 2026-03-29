@@ -22,6 +22,8 @@ class TodoGroupController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', TodoGroup::class);
+
         $todoGroups = $this->todoGroupService->getUserTodoGroups(auth()->id());
 
         return TodoGroupResource::collection($todoGroups);
@@ -32,8 +34,9 @@ class TodoGroupController extends Controller
      */
     public function store(StoreTodoGroupRequest $request)
     {
-        $data = $request->validated();
+        $this->authorize('create', TodoGroup::class);
 
+        $data = $request->validated();
         $data['user_id'] = auth()->id();
 
         $todoGroup = $this->todoGroupService->createTodoGroup($data);
@@ -46,6 +49,8 @@ class TodoGroupController extends Controller
      */
     public function show(TodoGroup $todoGroup)
     {
+        $this->authorize('view', $todoGroup);
+
         return new TodoGroupResource($todoGroup);
     }
 
@@ -54,6 +59,8 @@ class TodoGroupController extends Controller
      */
     public function update(UpdateTodoGroupRequest $request, TodoGroup $todoGroup)
     {
+        $this->authorize('update', $todoGroup);
+
         $todoGroup = $this->todoGroupService->updateTodoGroup(
             $todoGroup,
             $request->validated()
@@ -67,6 +74,8 @@ class TodoGroupController extends Controller
      */
     public function archive(TodoGroup $todoGroup)
     {
+        $this->authorize('archive', $todoGroup);
+
         $todoGroup = $this->todoGroupService->archiveTodoGroup($todoGroup);
 
         return new TodoGroupResource($todoGroup);
@@ -77,6 +86,8 @@ class TodoGroupController extends Controller
      */
     public function togglePin(TodoGroup $todoGroup)
     {
+        $this->authorize('togglePin', $todoGroup);
+
         $todoGroup = $this->todoGroupService->toggleTodoGroupPin($todoGroup);
 
         return new TodoGroupResource($todoGroup);
@@ -87,6 +98,8 @@ class TodoGroupController extends Controller
      */
     public function destroy(TodoGroup $todoGroup)
     {
+        $this->authorize('delete', $todoGroup);
+
         $this->todoGroupService->deleteTodoGroup($todoGroup);
 
         return response()->json([
