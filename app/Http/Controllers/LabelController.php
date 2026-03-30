@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Label;
-use App\Services\UserService;
+use App\Services\LabelService;
 use App\Http\Resources\LabelResource;
-use App\Http\Requests\StoreLabelRequest;
-use App\Http\Requests\UpdateLabelRequest;
+use App\Http\Requests\Label\StoreLabelRequest;
+use App\Http\Requests\Label\UpdateLabelRequest;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
 
 class LabelController extends Controller
 {
-    protected UserService $userService;
+    protected LabelService $labelService;
 
-    public function __construct(UserService $userService)
+    public function __construct(LabelService $labelService)
     {
-        $this->userService = $userService;
+        $this->labelService = $labelService;
     }
 
     /*
@@ -28,7 +28,7 @@ class LabelController extends Controller
     {
         $this->authorize('viewAny', Label::class);
 
-        $labels = $this->userService->getAllLabels(auth()->id(), true);
+        $labels = $this->labelService->getAllLabels(auth()->id(), true);
 
         return LabelResource::collection($labels);
     }
@@ -41,7 +41,7 @@ class LabelController extends Controller
     */
     public function show(int $id): LabelResource|JsonResponse
     {
-        $label = $this->userService->getLabelById(auth()->id(), $id);
+        $label = $this->labelService->getLabelById(auth()->id(), $id);
 
         if (!$label) {
             return response()->json(['message' => 'Label not found.'], 404);
@@ -61,7 +61,7 @@ class LabelController extends Controller
     {
         $this->authorize('create', Label::class);
 
-        $label = $this->userService->createLabel(
+        $label = $this->labelService->createLabel(
             auth()->id(),
             $request->validated()['name']
         );
@@ -78,7 +78,7 @@ class LabelController extends Controller
     {
         $this->authorize('update', $label);
 
-        $updatedLabel = $this->userService->updateLabel(
+        $updatedLabel = $this->labelService->updateLabel(
             $label,
             $request->validated()['name']
         );
@@ -95,7 +95,7 @@ class LabelController extends Controller
     {
         $this->authorize('delete', $label);
 
-        $this->userService->deleteLabel($label);
+        $this->labelService->deleteLabel($label);
 
         return response()->json([
             'message' => 'Label deleted successfully.'

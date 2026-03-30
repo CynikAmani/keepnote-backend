@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\TodoGroup;
 use App\Services\TodoGroupService;
 use App\Http\Resources\TodoGroupResource;
-use App\Http\Requests\StoreTodoGroupRequest;
-use App\Http\Requests\UpdateTodoGroupRequest;
+use App\Http\Requests\TodoGroup\StoreTodoGroupRequest;
+use App\Http\Requests\TodoGroup\UpdateTodoGroupRequest;
 
 class TodoGroupController extends Controller
 {

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use App\Services\NoteService;
 use App\Http\Resources\NoteResource;
-use App\Http\Requests\StoreNoteRequest;
-use App\Http\Requests\UpdateNoteRequest;
+use App\Http\Requests\Note\StoreNoteRequest;
+use App\Http\Requests\Note\UpdateNoteRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
