@@ -2,35 +2,28 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTodoGroupRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'label_id' => ['nullable', 'exists:labels,id'],
-
+            'label_id' => [
+                'nullable',
+                Rule::exists('labels', 'id')->where(function ($query) {
+                    $query->where('user_id', auth()->id());
+                }),
+            ],
             'title' => ['sometimes', 'string', 'max:255'],
-
             'color' => ['sometimes', 'string', 'max:50'],
-
             'is_pinned' => ['sometimes', 'boolean'],
-
             'is_archived' => ['sometimes', 'boolean'],
         ];
     }
