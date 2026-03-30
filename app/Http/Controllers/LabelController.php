@@ -22,12 +22,14 @@ class LabelController extends Controller
     /*
     ---------------------------------
     | Get all labels for the authenticated user
-    | Optionally include a preview of latest note/todos
     ---------------------------------
     */
     public function index(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Label::class);
+
         $labels = $this->userService->getAllLabels(auth()->id(), true);
+
         return LabelResource::collection($labels);
     }
 
@@ -45,6 +47,8 @@ class LabelController extends Controller
             return response()->json(['message' => 'Label not found.'], 404);
         }
 
+        $this->authorize('view', $label);
+
         return new LabelResource($label);
     }
 
@@ -55,7 +59,13 @@ class LabelController extends Controller
     */
     public function store(StoreLabelRequest $request): LabelResource
     {
-        $label = $this->userService->createLabel(auth()->id(), $request->validated()['name']);
+        $this->authorize('create', Label::class);
+
+        $label = $this->userService->createLabel(
+            auth()->id(),
+            $request->validated()['name']
+        );
+
         return new LabelResource($label);
     }
 
@@ -66,7 +76,13 @@ class LabelController extends Controller
     */
     public function update(UpdateLabelRequest $request, Label $label): LabelResource
     {
-        $updatedLabel = $this->userService->updateLabel($label, $request->validated()['name']);
+        $this->authorize('update', $label);
+
+        $updatedLabel = $this->userService->updateLabel(
+            $label,
+            $request->validated()['name']
+        );
+
         return new LabelResource($updatedLabel);
     }
 
@@ -77,7 +93,12 @@ class LabelController extends Controller
     */
     public function destroy(Label $label): JsonResponse
     {
+        $this->authorize('delete', $label);
+
         $this->userService->deleteLabel($label);
-        return response()->json(['message' => 'Label deleted successfully.']);
+
+        return response()->json([
+            'message' => 'Label deleted successfully.'
+        ]);
     }
 }
