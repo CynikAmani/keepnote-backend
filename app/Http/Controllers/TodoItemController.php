@@ -24,19 +24,17 @@ class TodoItemController extends Controller
      */
     public function store(StoreTodoItemRequest $request): TodoItemResource
     {
-        // The policy for creation can be handled elsewhere, e.g., on the group
+        $this->authorize('create', TodoItem::class);
+        
         $todoItem = $this->service->create($request->validated());
 
         return new TodoItemResource($todoItem);
     }
 
-    /*
-    ---------------------------------------------------------------------------------
-     | Update a Todo Item (task, completion status, position)
-     | Use the single `update` policy for all modifications
-     ---------------------------------------------------------------------------------
+    /**
+     * Update a Todo Item (task or other attributes)
      */
-    public function update(UpdateTodoItemRequest|UpdateTodoItemPositionRequest $request, TodoItem $todoItem): TodoItemResource
+    public function update(UpdateTodoItemRequest $request, TodoItem $todoItem): TodoItemResource
     {
         $this->authorize('update', $todoItem);
 
@@ -53,12 +51,39 @@ class TodoItemController extends Controller
      */
     public function destroy(TodoItem $todoItem): JsonResponse
     {
-        $this->authorize('update', $todoItem); // same policy
+        $this->authorize('delete', $todoItem);
 
         $this->service->delete($todoItem);
 
         return response()->json([
             'message' => 'Todo item deleted successfully'
         ]);
+    }
+
+    /**
+     * Toggle completion status
+     */
+    public function toggleCompletion(TodoItem $todoItem): TodoItemResource
+    {
+        $this->authorize('toggleCompletion', $todoItem);
+
+        $todoItem = $this->service->toggleCompletion($todoItem);
+
+        return new TodoItemResource($todoItem);
+    }
+
+    /**
+     * Update position (drag-and-drop ordering)
+     */
+    public function updatePosition(UpdateTodoItemPositionRequest $request, TodoItem $todoItem): TodoItemResource
+    {
+        $this->authorize('updatePosition', $todoItem);
+
+        $todoItem = $this->service->updatePosition(
+            $todoItem,
+            $request->validated()['position']
+        );
+
+        return new TodoItemResource($todoItem);
     }
 }
