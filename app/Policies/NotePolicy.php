@@ -10,14 +10,22 @@ class NotePolicy
 {
     use HandlesAuthorization;
 
+    /*
+    --------------------------------------------------------------
+    | Authorization for Note
+    --------------------------------------------------------------
+    */
+    private function isOwner(User $user, Note $note): bool
+    {
+        return $note->user_id === $user->id;
+    }
+
     /**
      * Determine whether the user can view any notes.
      */
     public function viewAny(User $user): bool
     {
-        
-        //Service will filter notes by user_id, so any authenticated user can view their own notes
-        return true;  
+        return true; // Service filters notes by user_id
     }
 
     /**
@@ -25,7 +33,7 @@ class NotePolicy
      */
     public function view(User $user, Note $note): bool
     {
-        return $note->user_id === $user->id;
+        return $this->isOwner($user, $note);
     }
 
     /**
@@ -33,7 +41,7 @@ class NotePolicy
      */
     public function create(User $user): bool
     {
-        return true; // Any authenticated user can create notes
+        return true;
     }
 
     /**
@@ -41,7 +49,7 @@ class NotePolicy
      */
     public function update(User $user, Note $note): bool
     {
-        return $note->user_id === $user->id;
+        return $this->isOwner($user, $note);
     }
 
     /**
@@ -49,7 +57,7 @@ class NotePolicy
      */
     public function delete(User $user, Note $note): bool
     {
-        return $note->user_id === $user->id;
+        return $this->isOwner($user, $note);
     }
 
     /**
@@ -57,7 +65,7 @@ class NotePolicy
      */
     public function togglePin(User $user, Note $note): bool
     {
-        return $note->user_id === $user->id;
+        return $this->isOwner($user, $note);
     }
 
     /**
@@ -65,7 +73,7 @@ class NotePolicy
      */
     public function archive(User $user, Note $note): bool
     {
-        return $note->user_id === $user->id;
+        return $this->isOwner($user, $note);
     }
 
     /**
@@ -73,6 +81,6 @@ class NotePolicy
      */
     public function unarchive(User $user, Note $note): bool
     {
-        return $note->user_id === $user->id;
+        return $this->isOwner($user, $note);
     }
 }

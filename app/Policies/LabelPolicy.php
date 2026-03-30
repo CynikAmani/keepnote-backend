@@ -10,6 +10,16 @@ class LabelPolicy
 {
     use HandlesAuthorization;
 
+    /*
+    --------------------------------------------------------------
+    | Authorization for Label
+    --------------------------------------------------------------
+    */
+    private function isOwner(User $user, Label $label): bool
+    {
+        return $label->user_id === $user->id;
+    }
+
     /**
      * Determine whether the user can view any labels.
      */
@@ -23,7 +33,7 @@ class LabelPolicy
      */
     public function view(User $user, Label $label): bool
     {
-        return true;
+        return $this->isOwner($user, $label);
     }
 
     /**
@@ -39,7 +49,7 @@ class LabelPolicy
      */
     public function update(User $user, Label $label): bool
     {
-        return $label->user_id === $user->id;
+        return $this->isOwner($user, $label);
     }
 
     /**
@@ -47,6 +57,6 @@ class LabelPolicy
      */
     public function delete(User $user, Label $label): bool
     {
-        return $label->user_id === $user->id;
+        return $this->isOwner($user, $label);
     }
 }

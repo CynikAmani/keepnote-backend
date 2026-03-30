@@ -10,12 +10,22 @@ class TodoGroupPolicy
 {
     use HandlesAuthorization;
 
+    /*
+    --------------------------------------------------------------
+    | Authorization for TodoGroup
+    --------------------------------------------------------------
+    */
+    private function isOwner(User $user, TodoGroup $todoGroup): bool
+    {
+        return $todoGroup->user_id === $user->id;
+    }
+
     /**
      * Determine whether the user can view any TodoGroups.
      */
     public function viewAny(User $user): bool
     {
-        return true;  //Service has owner ID filter, so any authenticated user can view their own groups
+        return true; // Filtered by service, so any user only sees their own groups
     }
 
     /**
@@ -23,7 +33,7 @@ class TodoGroupPolicy
      */
     public function view(User $user, TodoGroup $todoGroup): bool
     {
-        return $todoGroup->user_id === $user->id;
+        return $this->isOwner($user, $todoGroup);
     }
 
     /**
@@ -39,7 +49,7 @@ class TodoGroupPolicy
      */
     public function update(User $user, TodoGroup $todoGroup): bool
     {
-        return $todoGroup->user_id === $user->id;
+        return $this->isOwner($user, $todoGroup);
     }
 
     /**
@@ -47,7 +57,7 @@ class TodoGroupPolicy
      */
     public function archive(User $user, TodoGroup $todoGroup): bool
     {
-        return $todoGroup->user_id === $user->id;
+        return $this->isOwner($user, $todoGroup);
     }
 
     /**
@@ -55,7 +65,7 @@ class TodoGroupPolicy
      */
     public function togglePin(User $user, TodoGroup $todoGroup): bool
     {
-        return $todoGroup->user_id === $user->id;
+        return $this->isOwner($user, $todoGroup);
     }
 
     /**
@@ -63,6 +73,6 @@ class TodoGroupPolicy
      */
     public function delete(User $user, TodoGroup $todoGroup): bool
     {
-        return $todoGroup->user_id === $user->id;
+        return $this->isOwner($user, $todoGroup);
     }
 }

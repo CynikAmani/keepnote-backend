@@ -22,6 +22,8 @@ class TodoItemController extends Controller
      */
     public function store(StoreTodoItemRequest $request)
     {
+        $this->authorize('create', [TodoItem::class, $request->todo_group_id]);
+
         $todoItem = $this->service->create($request->validated());
 
         return new TodoItemResource($todoItem);
@@ -32,6 +34,8 @@ class TodoItemController extends Controller
      */
     public function update(UpdateTodoItemRequest $request, TodoItem $todoItem)
     {
+        $this->authorize('update', $todoItem);
+
         $todoItem = $this->service->update(
             $todoItem,
             $request->validated()
@@ -45,6 +49,8 @@ class TodoItemController extends Controller
      */
     public function destroy(TodoItem $todoItem)
     {
+        $this->authorize('delete', $todoItem);
+
         $this->service->delete($todoItem);
 
         return response()->json([
@@ -57,6 +63,8 @@ class TodoItemController extends Controller
      */
     public function toggleCompletion(TodoItem $todoItem)
     {
+        $this->authorize('toggleCompletion', $todoItem);
+
         $todoItem = $this->service->toggleCompletion($todoItem);
 
         return new TodoItemResource($todoItem);
@@ -67,6 +75,8 @@ class TodoItemController extends Controller
      */
     public function updatePosition(TodoItem $todoItem)
     {
+        $this->authorize('updatePosition', $todoItem);
+
         $todoItem = $this->service->updatePosition(
             $todoItem,
             request('position')
