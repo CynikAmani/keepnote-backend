@@ -14,9 +14,16 @@ class UpdateTodoItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'task' => ['sometimes','string','max:255'],
-            'is_completed' => ['sometimes','boolean'],
-            'position' => ['sometimes','integer','min:0'],
+            'task' => ['sometimes', 'string', 'max:255', 'required_without:is_completed'],
+            'is_completed' => ['sometimes', 'boolean', 'required_without:task'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'task.required_without' => 'You must provide either a task title or completion status.',
+            'is_completed.required_without' => 'You must provide either a task title or completion status.',
         ];
     }
 }

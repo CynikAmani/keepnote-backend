@@ -2,27 +2,16 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
-    /*
-    ---------------------------------
-    | Determine if user is authorized
-    ---------------------------------
-    */
     public function authorize(): bool
     {
         return true;
     }
 
-    /*
-    ---------------------------------
-    | Validation rules for request
-    ---------------------------------
-    */
     public function rules(): array
     {
         return [
@@ -37,6 +26,12 @@ class StoreUserRequest extends FormRequest
             ],
 
             'password' => ['required', 'string', 'min:8'],
+
+            'roles' => ['sometimes', 'array'],
+            'roles.*' => [
+                'integer',
+                Rule::exists('roles', 'id'),
+            ],
         ];
     }
 }

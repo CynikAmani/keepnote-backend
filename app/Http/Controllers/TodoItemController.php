@@ -7,6 +7,7 @@ use App\Services\TodoItemService;
 use App\Http\Resources\TodoItemResource;
 use App\Http\Requests\TodoItem\StoreTodoItemRequest;
 use App\Http\Requests\TodoItem\UpdateTodoItemRequest;
+use App\Http\Requests\TodoItem\UpdateTodoItemPositionRequest;
 
 class TodoItemController extends Controller
 {
@@ -73,15 +74,15 @@ class TodoItemController extends Controller
     /**
      * Update position (drag and drop)
      */
-    public function updatePosition(TodoItem $todoItem)
+    public function updatePosition(UpdateTodoItemPositionRequest $request, TodoItem $todoItem)
     {
         $this->authorize('updatePosition', $todoItem);
-
+    
         $todoItem = $this->service->updatePosition(
             $todoItem,
-            request('position')
+            $request->validated()['position'] // guaranteed to be an integer
         );
-
+    
         return new TodoItemResource($todoItem);
     }
 }
