@@ -8,10 +8,11 @@ use App\Http\Resources\TodoItemResource;
 use App\Http\Requests\TodoItem\StoreTodoItemRequest;
 use App\Http\Requests\TodoItem\UpdateTodoItemRequest;
 use App\Http\Requests\TodoItem\UpdateTodoItemPositionRequest;
+use Illuminate\Http\JsonResponse;
 
 class TodoItemController extends Controller
 {
-    protected $service;
+    protected TodoItemService $service;
 
     public function __construct(TodoItemService $service)
     {
@@ -19,21 +20,23 @@ class TodoItemController extends Controller
     }
 
     /**
-     * Store Todo Item
+     * Store a new Todo Item
      */
-    public function store(StoreTodoItemRequest $request)
+    public function store(StoreTodoItemRequest $request): TodoItemResource
     {
-        $this->authorize('create', [TodoItem::class, $request->todo_group_id]);
-
+        // The policy for creation can be handled elsewhere, e.g., on the group
         $todoItem = $this->service->create($request->validated());
 
         return new TodoItemResource($todoItem);
     }
 
-    /**
-     * Update Todo Item
+    /*
+    ---------------------------------------------------------------------------------
+     | Update a Todo Item (task, completion status, position)
+     | Use the single `update` policy for all modifications
+     ---------------------------------------------------------------------------------
      */
-    public function update(UpdateTodoItemRequest $request, TodoItem $todoItem)
+    public function update(UpdateTodoItemRequest|UpdateTodoItemPositionRequest $request, TodoItem $todoItem): TodoItemResource
     {
         $this->authorize('update', $todoItem);
 
@@ -46,43 +49,16 @@ class TodoItemController extends Controller
     }
 
     /**
-     * Delete Todo Item
+     * Delete a Todo Item
      */
-    public function destroy(TodoItem $todoItem)
+    public function destroy(TodoItem $todoItem): JsonResponse
     {
-        $this->authorize('delete', $todoItem);
+        $this->authorize('update', $todoItem); // same policy
 
         $this->service->delete($todoItem);
 
         return response()->json([
             'message' => 'Todo item deleted successfully'
         ]);
-    }
-
-    /**
-     * Toggle completion status
-     */
-    public function toggleCompletion(TodoItem $todoItem)
-    {
-        $this->authorize('toggleCompletion', $todoItem);
-
-        $todoItem = $this->service->toggleCompletion($todoItem);
-
-        return new TodoItemResource($todoItem);
-    }
-
-    /**
-     * Update position (drag and drop)
-     */
-    public function updatePosition(UpdateTodoItemPositionRequest $request, TodoItem $todoItem)
-    {
-        $this->authorize('updatePosition', $todoItem);
-    
-        $todoItem = $this->service->updatePosition(
-            $todoItem,
-            $request->validated()['position'] // guaranteed to be an integer
-        );
-    
-        return new TodoItemResource($todoItem);
     }
 }
