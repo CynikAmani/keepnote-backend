@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -9,7 +10,6 @@ use App\Http\Controllers\LabelController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TodoGroupController;
 use App\Http\Controllers\TodoItemController;
-use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,17 +17,16 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-
-Route::prefix('auth')->group(function () {
+// --- Public Auth Routes (Rate Limited) ---
+Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::post('/signin', [AuthController::class, 'signin']);
     Route::post('/signup', [AuthController::class, 'signup']);
 });
 
+// --- Protected Routes (Authenticated + Rate Limited) ---
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
-//---- All routes below require authentication and are rate limited to 60 requests per minute ----
-Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
-
-     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // --- Users ---
     Route::prefix('users')->group(function () {
@@ -50,11 +49,8 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
         Route::get('/{role}/permissions', [RolePermissionController::class, 'index'])->middleware('permission:view-role-permissions');
         Route::post('/{role}/permissions', [RolePermissionController::class, 'assign'])->middleware('permission:update-role-permissions');
         Route::put('/{role}/permissions', [RolePermissionController::class, 'sync'])->middleware('permission:update-role-permissions');
-        Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'revoke'])
-        ->middleware('permission:update-role-permissions');
+        Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'revoke'])->middleware('permission:update-role-permissions');
     });
-
-    
 
     // --- Permissions ---
     Route::prefix('permissions')->group(function () {
@@ -77,18 +73,13 @@ Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
         Route::get('/', [NoteController::class, 'index'])->middleware('permission:view-notes');
         Route::get('/archived', [NoteController::class, 'archived'])->middleware('permission:view-notes');
         Route::get('/{note}', [NoteController::class, 'show'])->middleware('permission:view-notes');
-    
         Route::post('/', [NoteController::class, 'store'])->middleware('permission:create-note');
-    
         Route::put('/{note}', [NoteController::class, 'update'])->middleware('permission:update-note');
-    
         Route::patch('/{note}/pin', [NoteController::class, 'togglePin'])->middleware('permission:update-note');
         Route::patch('/{note}/archive', [NoteController::class, 'archive'])->middleware('permission:update-note');
         Route::patch('/{note}/unarchive', [NoteController::class, 'unarchive'])->middleware('permission:update-note');
-    
         Route::delete('/{note}', [NoteController::class, 'destroy'])->middleware('permission:delete-note');
     });
-
 
     // --- TodoGroups ---
     Route::prefix('todo-groups')->group(function () {
