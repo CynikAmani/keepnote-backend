@@ -9,6 +9,7 @@ use App\Http\Controllers\LabelController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TodoGroupController;
 use App\Http\Controllers\TodoItemController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +17,17 @@ use App\Http\Controllers\TodoItemController;
 |--------------------------------------------------------------------------
 */
 
+
+Route::prefix('auth')->group(function () {
+    Route::post('/signin', [AuthController::class, 'signin']);
+    Route::post('/signup', [AuthController::class, 'signup']);
+});
+
+
+//---- All routes below require authentication and are rate limited to 60 requests per minute ----
 Route::middleware('auth:sanctum', 'throttle:60,1')->group(function () {
+
+     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // --- Users ---
     Route::prefix('users')->group(function () {
