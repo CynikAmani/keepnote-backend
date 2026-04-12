@@ -9,6 +9,12 @@ class UpdateTodoGroupRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        $todoGroup = $this->route('todoGroup');
+
+        if ($todoGroup && $todoGroup->is_archived) {
+            return false;
+        }
+
         return true;
     }
 

@@ -26,16 +26,6 @@ class Note extends Model
     protected $with = ['label'];
 
     /**
-     * Global Scope
-     */
-    protected static function booted()
-    {
-        static::addGlobalScope('active', function (Builder $builder) {
-            $builder->where('is_archived', false);
-        });
-    }
-
-    /**
      * Relationships
      */
     public function user()
@@ -56,10 +46,14 @@ class Note extends Model
         return $query->where('user_id', $userId);
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('is_archived', false);
+    }
+
     public function scopeArchived($query)
     {
-        return $query->withoutGlobalScope('active')
-                     ->where('is_archived', true);
+        return $query->where('is_archived', true);
     }
 
     /**

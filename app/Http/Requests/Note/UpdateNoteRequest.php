@@ -9,6 +9,12 @@ class UpdateNoteRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        $note = $this->route('note');
+
+        if ($note && $note->is_archived) {
+            return false;  
+        }
+
         return true;
     }
 

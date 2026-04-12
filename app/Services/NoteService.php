@@ -14,6 +14,7 @@ class NoteService
     public function getUserNotes(int $userId): Collection
     {
         return Note::forUser($userId)
+            ->active()
             ->orderByDesc('is_pinned')
             ->latest()
             ->get();
