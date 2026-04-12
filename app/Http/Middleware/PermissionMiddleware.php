@@ -17,22 +17,28 @@ class PermissionMiddleware
      */
     public function handle(Request $request, Closure $next, string $permission)
     {
-        $user = $request->user(); // relations are lazy loaded on access
-
+        $user = $request->user();
+    
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-
-        // Load roles + permissions if not already loaded
+    
         $user->loadMissing('roles.permissions');
-
-        // Support multiple permissions: "update-user,delete-user"
+    
+        // Bypass permission check for admins and super-admins
+        $bypassRoles = ['admin', 'super-admin'];
+        $userRoles = $user->roles->pluck('name')->toArray();
+    
+        if (!empty(array_intersect($bypassRoles, $userRoles))) {
+            return $next($request);
+        }
+    
         $permissions = array_map('trim', explode(',', $permission));
-
+    
         if (!$user->hasPermission($permissions)) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
-
+    
         return $next($request);
     }
 }

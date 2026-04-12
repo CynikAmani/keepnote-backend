@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use \App\Models\Role;
 
 class AuthService
 {
@@ -22,7 +23,14 @@ class AuthService
     public function signup(array $data): User
     {
         $user = User::create($data);
-
+    
+        // We use firstOrCreate just in case the role isn't in the DB yet
+        $defaultRole = Role::where('name', 'user')->first();
+        
+        if ($defaultRole) {
+            $user->roles()->attach($defaultRole->id);
+        }
+    
         return $user->load(['roles.permissions']);
     }
 

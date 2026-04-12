@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('todo_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('todo_group_id')->constrained()->onDelete('cascade')->index();
+            $table->foreignId('todo_group_id')->constrained()->cascadeOnDelete();
             
             $table->string('task');
             $table->boolean('is_completed')->default(false);
             $table->integer('position')->default(0); // For drag-and-drop ordering
             
             $table->timestamps();
+
+            $table->index('todo_group_id');
         });
     }
 

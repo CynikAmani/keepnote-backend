@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('todo_groups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade')->index();
-            $table->foreignId('label_id')->nullable()->constrained()->onDelete('set null')->index();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('label_id')->nullable()->constrained()->nullOnDelete();
             
             $table->string('title')->fullText();
             $table->string('color')->default('white');
@@ -25,6 +25,9 @@ return new class extends Migration
             
             $table->timestamps();
             $table->softDeletes(); 
+
+            $table->index('user_id');
+            $table->index('label_id');
         });
     }
 

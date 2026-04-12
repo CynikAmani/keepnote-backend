@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade')->index(); // Fast lookup for a user's notes
-            $table->foreignId('label_id')->nullable()->constrained()->onDelete('set null')->index(); //Fast lookup for notes by label
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Fast lookup for a user's notes
+            $table->foreignId('label_id')->nullable()->constrained()->nullOnDelete(); // Fast lookup for notes by label
             
             $table->string('title')->fullText(); // Index for faster search by title;
             $table->text('content')->nullable()->fullText(); // Full-text index for content search
@@ -26,6 +26,9 @@ return new class extends Migration
             
             $table->timestamps();
             $table->softDeletes(); // This adds a 'deleted_at' column for "is_deleted" logic
+
+            $table->index('user_id');
+            $table->index('label_id');
         });
     }
 
