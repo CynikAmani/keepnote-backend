@@ -90,6 +90,10 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::delete('/{todoGroup}', [TodoGroupController::class, 'destroy'])->middleware('permission:delete-todo-group');
         Route::patch('/{todoGroup}/archive', [TodoGroupController::class, 'archive'])->middleware('permission:update-todo-group');
         Route::patch('/{todoGroup}/toggle-pin', [TodoGroupController::class, 'togglePin'])->middleware('permission:update-todo-group');
+        
+        // Batch Items
+        Route::post('/{todoGroup}/items/batch', [TodoItemController::class, 'batchStore'])->middleware('permission:create-todo-item');
+        Route::patch('/{todoGroup}/items/batch', [TodoItemController::class, 'batchUpdate'])->middleware('permission:update-todo-item');
     });
 
     // --- TodoItems ---
