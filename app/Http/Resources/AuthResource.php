@@ -19,21 +19,7 @@ class AuthResource extends JsonResource
     {
         return [
             'token' => $this->token,
-
             'user' => new UserResource($this->resource),
-
-            'roles' => $this->whenLoaded('roles', function () {
-                return $this->roles->pluck('name');
-            }),
-
-            'permissions' => $this->whenLoaded('roles', function () {
-                return $this->roles
-                    ->flatMap(fn ($role) =>
-                        $role->permissions->pluck('name')
-                    )
-                    ->unique()
-                    ->values();
-            }),
         ];
     }
 }
