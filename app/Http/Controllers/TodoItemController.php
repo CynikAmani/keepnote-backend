@@ -11,6 +11,7 @@ use App\Http\Requests\TodoItem\UpdateTodoItemPositionRequest;
 use App\Http\Requests\TodoItem\BatchStoreTodoItemRequest;
 use App\Http\Requests\TodoItem\BatchUpdateTodoItemRequest;
 use App\Models\TodoGroup;
+use App\Http\Resources\TodoGroupResource;
 use Illuminate\Http\JsonResponse;
 
 class TodoItemController extends Controller
@@ -98,33 +99,30 @@ class TodoItemController extends Controller
         // Require permission to update the group in order to add items to it
         $this->authorize('update', $todoGroup);
 
-        $createdItems = $this->service->batchCreate(
+        $this->service->batchCreate(
             $todoGroup,
             $request->validated()['todo_items'] ?? []
         );
 
-        return TodoItemResource::collection($createdItems);
+        return new TodoGroupResource($todoGroup->load('todoItems'));
     }
 
     /**
      * Batch update and delete Todo Items for a given TodoGroup
      */
-    public function batchUpdate(BatchUpdateTodoItemRequest $request, TodoGroup $todoGroup): JsonResponse
+    public function batchUpdate(BatchUpdateTodoItemRequest $request, TodoGroup $todoGroup)
     {
         // Require permission to update the group in order to update its items
         $this->authorize('update', $todoGroup);
 
         $validated = $request->validated();
         
-        $updatedItems = $this->service->batchUpdateAndDelete(
+        $this->service->batchUpdateAndDelete(
             $todoGroup,
             $validated['update_items'] ?? [],
             $validated['delete_item_ids'] ?? []
         );
 
-        return response()->json([
-            'message' => 'Batch update completed',
-            'data' => TodoItemResource::collection($updatedItems)
-        ]);
+        return new TodoGroupResource($todoGroup->load('todoItems'));
     }
 }
