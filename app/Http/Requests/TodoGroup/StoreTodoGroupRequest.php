@@ -26,7 +26,7 @@ class StoreTodoGroupRequest extends FormRequest
             'is_pinned' => ['sometimes', 'boolean'],
             'todo_items' => ['sometimes', 'array'],
             'todo_items.*.task' => ['required_with:todo_items', 'string', 'max:1000'],
-            'todo_items.*.position' => ['required_with:todo_items', 'integer', 'min:1', 'distinct'],
+            'todo_items.*.position' => ['required_with:todo_items', 'integer', 'min:0', 'distinct'],
         ];
     }
 }
