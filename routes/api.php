@@ -10,6 +10,7 @@ use App\Http\Controllers\LabelController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\TodoGroupController;
 use App\Http\Controllers\TodoItemController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,9 @@ Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+    // --- Dashboard (we break REST standard for efficiency) ---
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 
     // --- Users ---
     Route::prefix('users')->group(function () {
