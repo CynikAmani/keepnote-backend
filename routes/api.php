@@ -51,7 +51,6 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
         // Role Permissions
         Route::get('/{role}/permissions', [RolePermissionController::class, 'index'])->middleware('permission:view-role-permissions');
-        Route::post('/{role}/permissions', [RolePermissionController::class, 'assign'])->middleware('permission:update-role-permissions');
         Route::put('/{role}/permissions', [RolePermissionController::class, 'sync'])->middleware('permission:update-role-permissions');
         Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'revoke'])->middleware('permission:update-role-permissions');
     });

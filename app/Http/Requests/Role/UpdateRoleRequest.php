@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Role;
 
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRoleRequest extends FormRequest
@@ -11,15 +12,18 @@ class UpdateRoleRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Validation rules for updating a role.
-     */
     public function rules(): array
     {
-        $roleId = $this->route('role');
+        $role = $this->route('role');
 
         return [
-            'name' => ['sometimes', 'string', 'max:150', "unique:roles,name,$roleId"],
+            'name' => [
+                'sometimes', 
+                'string', 
+                'max:150', 
+                "unique:roles,name,{$role->id}"
+            ],
+            'description' => ['nullable', 'string', 'max:255'],
         ];
     }
 }
