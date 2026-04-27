@@ -3,44 +3,25 @@
 namespace App\Services;
 
 use App\Models\Role;
-use App\Models\Permission;
+use Illuminate\Database\Eloquent\Collection;
 
 class RolePermissionService
 {
     /**
-     * Get permissions assigned to a role
+     * Get all permissions currently assigned to a role.
      */
-    public function getPermissionsForRole(Role $role)
+    public function getPermissionsForRole(Role $role): Collection
     {
-        return $role->permissions()->get();
+        return $role->permissions()->get(['permissions.id', 'name', 'display_name', 'module']);
     }
 
     /**
-     * Attach permissions to role
-     */
-    public function assignPermissionsToRole(Role $role, array $permissionIds): Role
-    {
-        $role->permissions()->syncWithoutDetaching($permissionIds);
-
-        return $role->load('permissions');
-    }
-
-    /**
-     * Replace all permissions of a role
+     * Replace all permissions of a role in one batch.
      */
     public function syncRolePermissions(Role $role, array $permissionIds): Role
     {
+        // sync() handles adding new and removing old links in the pivot table automatically
         $role->permissions()->sync($permissionIds);
-
-        return $role->load('permissions');
-    }
-
-    /**
-     * Remove permission from role
-     */
-    public function revokePermissionFromRole(Role $role, Permission $permission): Role
-    {
-        $role->permissions()->detach($permission->id);
 
         return $role->load('permissions');
     }

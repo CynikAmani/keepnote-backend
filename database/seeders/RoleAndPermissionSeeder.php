@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -9,46 +10,65 @@ class RoleAndPermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Define all permissions based on your routes
-        $permissions = [
-            // User Management
-            'view-users', 'create-user', 'update-user', 'delete-user',
-
-            // Role & Permission Management
-            'view-roles', 'create-role', 'update-role', 'delete-role',
-            'view-role-permissions', 'update-role-permissions',
-
-            // Labels
-            'view-labels', 'create-label', 'update-label', 'delete-label',
-
-            // Notes
-            'view-notes', 'create-note', 'update-note', 'delete-note',
-            
-            // Todos
-            'view-todo-groups', 'create-todo-group', 'update-todo-group', 'delete-todo-group',
-            'create-todo-item', 'update-todo-item', 'delete-todo-item',
+        $data = [
+            'Users' => [
+                'view-users'   => 'View Users',
+                'create-user'  => 'Create User',
+                'update-user'  => 'Update User',
+                'delete-user'  => 'Delete User',
+            ],
+            'Roles' => [
+                'view-roles'              => 'View Roles',
+                'create-role'             => 'Create Role',
+                'update-role'             => 'Update Role',
+                'delete-role'             => 'Delete Role',
+                'view-role-permissions'   => 'View Role Permissions',
+                'update-role-permissions' => 'Update Role Permissions',
+            ],
+            'Notes' => [
+                'view-notes'   => 'View Notes',
+                'create-note'  => 'Create Note',
+                'update-note'  => 'Update Note',
+                'delete-note'  => 'Delete Note',
+            ],
+            'Todos' => [
+                'view-todo-groups'   => 'View Todo Groups',
+                'create-todo-group'  => 'Create Todo Group',
+                'update-todo-group'  => 'Update Todo Group',
+                'delete-todo-group'  => 'Delete Todo Group',
+                'create-todo-item'   => 'Create Todo Item',
+                'update-todo-item'   => 'Update Todo Item',
+                'delete-todo-item'   => 'Delete Todo Item',
+            ],
+            'Labels' => [
+                'view-labels'   => 'View Labels',
+                'create-label'  => 'Create Label',
+                'update-label'  => 'Update Label',
+                'delete-label'  => 'Delete Label',
+            ],
         ];
-    
-        foreach ($permissions as $permissionName) {
-            Permission::firstOrCreate(['name' => $permissionName]);
+
+        foreach ($data as $module => $actions) {
+            foreach ($actions as $name => $displayName) {
+                Permission::updateOrCreate(
+                    ['name' => $name],
+                    [
+                        'display_name' => $displayName,
+                        'module'       => $module,
+                    ]
+                );
+            }
         }
-    
-        // 2. Create Roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole  = Role::firstOrCreate(['name' => 'user']);
-    
-        // 3. Mapping: Give 'user' a restricted set of permissions
-        $userPermissions = Permission::whereIn('name', [
-            'view-labels', 'create-label', 'update-label', 'delete-label',
-            'view-notes', 'create-note', 'update-note', 'delete-note',
-            'view-todo-groups', 'create-todo-group', 'update-todo-group', 'delete-todo-group',
-            'create-todo-item', 'update-todo-item', 'delete-todo-item',
-        ])->get();
-    
-        $userRole->permissions()->sync($userPermissions->pluck('id'));
-    
-        // 4. Mapping: Give 'admin' EVERYTHING
-        $allPermissions = Permission::all();
-        $adminRole->permissions()->sync($allPermissions->pluck('id'));
+
+        // Initialize basic roles
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $user  = Role::firstOrCreate(['name' => 'user']);
+
+        // Admin gets everything
+        $admin->permissions()->sync(Permission::all()->pluck('id'));
+
+        // User gets content-related permissions
+        $userPermissions = Permission::whereIn('module', ['Notes', 'Todos', 'Labels'])->pluck('id');
+        $user->permissions()->sync($userPermissions);
     }
 }

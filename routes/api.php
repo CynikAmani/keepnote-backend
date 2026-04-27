@@ -56,12 +56,13 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'revoke'])->middleware('permission:update-role-permissions');
     });
 
-    // --- Permissions ---
-    Route::prefix('permissions')->group(function () {
-        Route::post('/', [PermissionController::class, 'store'])->middleware('permission:create-permission');
-        Route::put('/{permission}', [PermissionController::class, 'update'])->middleware('permission:update-permission');
-        Route::delete('/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:delete-permission');
-    });
+   // --- Permissions ---
+   Route::prefix('permissions')->group(function () {
+       Route::get('/', [PermissionController::class, 'index'])->middleware('permission:view-roles'); 
+       Route::post('/', [PermissionController::class, 'store'])->middleware('permission:create-role');
+       Route::put('/{permission}', [PermissionController::class, 'update'])->middleware('permission:update-role');
+       Route::delete('/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:delete-role');
+   });
 
     // --- Labels ---
     Route::prefix('labels')->group(function () {

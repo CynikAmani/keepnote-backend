@@ -7,18 +7,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PermissionResource extends JsonResource
 {
-    /**
-     * Transform the permission into an API response structure.
-     */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'displayName' => $this->display_name,
+            'module' => $this->module,
             'description' => $this->description,
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }
