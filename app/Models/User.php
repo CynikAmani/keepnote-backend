@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -12,11 +14,16 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = ['name', 'email', 'password'];
-    protected $hidden   = ['password', 'remember_token'];
-    protected $casts    = ['email_verified_at' => 'datetime', 'password' => 'hashed'];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     public function roles()
     {
@@ -34,6 +41,7 @@ class User extends Authenticatable
     public function hasRole(string|array $role): bool
     {
         $roles = is_array($role) ? $role : [$role];
+
         return $this->roles->pluck('name')->intersect($roles)->isNotEmpty();
     }
 
@@ -44,9 +52,9 @@ class User extends Authenticatable
             return true;
         }
 
-        // 2. Check permissions across all roles
+        // 2. Check permissions across all roles (lazy-loaded as designed)
         $permissions = is_array($permission) ? $permission : [$permission];
-        
+
         $userPermissions = $this->roles->flatMap(function ($role) {
             return $role->permissions->pluck('name');
         });

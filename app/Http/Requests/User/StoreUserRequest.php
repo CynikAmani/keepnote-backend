@@ -26,12 +26,6 @@ class StoreUserRequest extends FormRequest
             ],
 
             'password' => ['required', 'string', 'min:8'],
-
-            'roles' => ['sometimes', 'array'],
-            'roles.*' => [
-                'integer',
-                Rule::exists('roles', 'id'),
-            ],
         ];
     }
 }

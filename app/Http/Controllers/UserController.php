@@ -39,7 +39,6 @@ class UserController extends Controller
     /*
     ---------------------------------
     | Get single user by ID
-    | Service handles eager loading
     ---------------------------------
     */
     public function show(int $id): UserResource
@@ -56,7 +55,9 @@ class UserController extends Controller
     */
     public function store(StoreUserRequest $request): UserResource
     {
-        $user = $this->userService->createUser($request->validated());
+        $user = $this->userService->createUser(
+            $request->validated()
+        );
 
         return new UserResource($user);
     }
@@ -64,7 +65,6 @@ class UserController extends Controller
     /*
     ---------------------------------
     | Update user
-    | Model binding used (no relations required)
     ---------------------------------
     */
     public function update(UpdateUserRequest $request, User $user): UserResource
@@ -79,8 +79,7 @@ class UserController extends Controller
 
     /*
     ---------------------------------
-    | Delete user
-    | Model binding used (no relations required)
+    | Delete user (soft delete)
     ---------------------------------
     */
     public function destroy(User $user): JsonResponse
@@ -88,7 +87,49 @@ class UserController extends Controller
         $this->userService->deleteUser($user);
 
         return response()->json([
-            'message' => 'User deleted successfully.'
+            'message' => 'User deactivated successfully.'
+        ]);
+    }
+
+    /*
+    ---------------------------------
+    | Restore user (activate)
+    ---------------------------------
+    */
+    public function restore(User $user): JsonResponse
+    {
+        $this->userService->restoreUser($user);
+
+        return response()->json([
+            'message' => 'User activated successfully.'
+        ]);
+    }
+
+    /*
+    ---------------------------------
+    | Revoke all user tokens
+    ---------------------------------
+    */
+    public function revokeTokens(User $user): JsonResponse
+    {
+        $this->userService->revokeTokens($user);
+
+        return response()->json([
+            'message' => 'User tokens revoked successfully.'
+        ]);
+    }
+
+        /*
+    ---------------------------------
+    | Reset user password (admin)
+    ---------------------------------
+    */
+    public function resetPassword(User $user): JsonResponse
+    {
+        $this->userService->resetPassword($user);
+
+        return response()->json([
+            'message' => 'User password reset successfully.'
         ]);
     }
 }

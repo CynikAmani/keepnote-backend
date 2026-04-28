@@ -32,13 +32,22 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     // --- Dashboard (we break REST standard for efficiency) ---
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // --- Users ---
+     // --- Users ---
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->middleware('permission:view-users');
         Route::get('/{id}', [UserController::class, 'show'])->middleware('permission:view-users');
         Route::post('/', [UserController::class, 'store'])->middleware('permission:create-user');
         Route::put('/{user}', [UserController::class, 'update'])->middleware('permission:update-user');
+        Route::post('/{user}/reset-password', [UserController::class, 'resetPassword'])->middleware('permission:update-user');
+
+        // User Lifecycle
         Route::delete('/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-user');
+        Route::post('/{user}/restore', [UserController::class, 'restore'])->middleware('permission:update-user');
+        Route::post('/{user}/revoke-tokens', [UserController::class, 'revokeTokens'])->middleware('permission:update-user');
+
+        // User Roles
+        Route::get('/{user}/roles', [RoleUserController::class, 'index'])->middleware('permission:view-user-roles');
+        Route::put('/{user}/roles', [RoleUserController::class, 'sync'])->middleware('permission:update-user-roles');
     });
 
     // --- Roles ---

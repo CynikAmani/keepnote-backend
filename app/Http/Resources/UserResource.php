@@ -17,13 +17,14 @@ class UserResource extends JsonResource
             'name'        => $this->name,
             'email'       => $this->email,
             'is_verified' => $this->is_verified,
+            'is_deleted'  => $this->trashed(),
             'created_at'  => $this->created_at?->toDateTimeString(),
 
-            'roles' => $this->whenLoaded('roles', function() {
+            'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name')->unique()->values();
             }),
 
-            'permissions' => $this->whenLoaded('roles', function() {
+            'permissions' => $this->whenLoaded('roles', function () {
                 return $this->roles->flatMap->permissions->pluck('name')->unique()->values();
             }),
         ];
