@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         // System-critical seeders must run in every environment.
         $this->call([
             RoleAndPermissionSeeder::class,
+            AdminUserSeeder::class,
         ]);
 
         // Development and test data uses factories, which depend on fakerphp/faker.
