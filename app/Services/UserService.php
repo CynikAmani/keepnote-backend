@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -14,6 +14,7 @@ class UserService
     public function getAllUsers(int $perPage = 30): LengthAwarePaginator
     {
         return User::latest()
+            ->with(['roles'])
             ->paginate($perPage);
     }
 
@@ -22,7 +23,8 @@ class UserService
      */
     public function findUser(int $id): User
     {
-        return User::findOrFail($id);
+        return User::with(['roles'])
+            ->findOrFail($id);
     }
 
     /**
@@ -30,7 +32,7 @@ class UserService
      */
     public function createUser(array $data): User
     {
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
 
@@ -42,7 +44,7 @@ class UserService
      */
     public function updateUser(User $user, array $data): User
     {
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
@@ -77,14 +79,13 @@ class UserService
         $user->tokens()->delete();
     }
 
-
     /**
      * Admin password reset (sets default password)
      */
     public function resetPassword(User $user): void
     {
         $user->update([
-            'password' => Hash::make('ChangeMir!Bitte')
+            'password' => Hash::make('ChangeMir!Bitte'),
         ]);
     }
 }

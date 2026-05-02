@@ -27,7 +27,10 @@ class User extends Authenticatable
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class)->withTimestamps();
+        // Added 'assigned_by' to pivot
+        return $this->belongsToMany(Role::class)
+                    ->withPivot('assigned_by') 
+                    ->withTimestamps();
     }
 
     // --- ACCESSORS ---

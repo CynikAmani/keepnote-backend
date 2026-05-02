@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\RoleUserService;
 use App\Http\Resources\RoleResource;
+use App\Http\Resources\UserResource;
 use App\Http\Requests\RoleUser\SyncUserRolesRequest;
 
 class RoleUserController extends Controller
@@ -29,15 +30,13 @@ class RoleUserController extends Controller
     /**
      * Batch update all roles for a user
      */
-    public function sync(SyncUserRolesRequest $request, User $user)
+    public function sync(SyncUserRolesRequest $request, User $user): UserResource
     {
-        $this->service->syncUserRoles(
-            $user,
-            $request->validated()['roles']
-        );
-
-        return response()->json([
-            'message' => 'Roles updated successfully'
-        ]);
+        $this->service->syncUserRoles($user, $request->validated('roles'));
+        
+        // Refresh user with updated roles
+        $user->load('roles');
+    
+        return new UserResource($user);
     }
 }

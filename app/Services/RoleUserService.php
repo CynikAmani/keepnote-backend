@@ -3,30 +3,21 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class RoleUserService
 {
-    /**
-     * Get all roles assigned to a user
-     */
     public function getRolesForUser(User $user): Collection
     {
         return $user->roles()->get(['roles.id', 'roles.name']);
     }
 
-    /**
-     * Replace all roles of a user in one batch
-     */
     public function syncUserRoles(User $user, array $roleIds): void
     {
-        $assignedBy = auth()->id();
+        $adminId = auth()->id();
 
-        $syncData = collect($roleIds)
-            ->mapWithKeys(fn ($id) => [
-                $id => ['assigned_by' => $assignedBy]
-            ])
-            ->toArray();
+        // Format sync data: [role_id => ['assigned_by' => X]]
+        $syncData = array_fill_keys($roleIds, ['assigned_by' => $adminId]);
 
         $user->roles()->sync($syncData);
     }

@@ -1,16 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\RoleUserController;
 use App\Http\Controllers\TodoGroupController;
 use App\Http\Controllers\TodoItemController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +33,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     // --- Dashboard (we break REST standard for efficiency) ---
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-     // --- Users ---
+    // --- Users ---
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->middleware('permission:view-users');
         Route::get('/{id}', [UserController::class, 'show'])->middleware('permission:view-users');
@@ -64,13 +65,13 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::delete('/{role}/permissions/{permission}', [RolePermissionController::class, 'revoke'])->middleware('permission:update-role-permissions');
     });
 
-   // --- Permissions ---
-   Route::prefix('permissions')->group(function () {
-       Route::get('/', [PermissionController::class, 'index'])->middleware('permission:view-roles'); 
-       Route::post('/', [PermissionController::class, 'store'])->middleware('permission:create-role');
-       Route::put('/{permission}', [PermissionController::class, 'update'])->middleware('permission:update-role');
-       Route::delete('/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:delete-role');
-   });
+    // --- Permissions ---
+    Route::prefix('permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'index'])->middleware('permission:view-roles');
+        Route::post('/', [PermissionController::class, 'store'])->middleware('permission:create-role');
+        Route::put('/{permission}', [PermissionController::class, 'update'])->middleware('permission:update-role');
+        Route::delete('/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:delete-role');
+    });
 
     // --- Labels ---
     Route::prefix('labels')->group(function () {
@@ -103,7 +104,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::delete('/{todoGroup}', [TodoGroupController::class, 'destroy'])->middleware('permission:delete-todo-group');
         Route::patch('/{todoGroup}/archive', [TodoGroupController::class, 'archive'])->middleware('permission:update-todo-group');
         Route::patch('/{todoGroup}/toggle-pin', [TodoGroupController::class, 'togglePin'])->middleware('permission:update-todo-group');
-        
+
         // Batch Items
         Route::post('/{todoGroup}/items/batch', [TodoItemController::class, 'batchStore'])->middleware('permission:create-todo-item');
         Route::patch('/{todoGroup}/items/batch', [TodoItemController::class, 'batchUpdate'])->middleware('permission:update-todo-item');
