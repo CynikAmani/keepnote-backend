@@ -61,6 +61,14 @@ class TodoGroupPolicy
     }
 
     /**
+     * Determine whether the user can unarchive a TodoGroup.
+     */
+    public function unarchive(User $user, TodoGroup $todoGroup): bool
+    {
+        return $this->isOwner($user, $todoGroup);
+    }
+
+    /**
      * Determine whether the user can toggle pin.
      */
     public function togglePin(User $user, TodoGroup $todoGroup): bool

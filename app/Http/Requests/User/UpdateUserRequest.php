@@ -14,16 +14,25 @@ class UpdateUserRequest extends FormRequest
 
     public function rules(): array
     {
-        $userId = $this->route('user')->id;
+        $user = $this->route('user');
+        $isSelfUpdate = auth()->check() && auth()->id() === $user->id;
 
         return [
-            'name'     => 'sometimes|string|max:255',
-            'email'    => [
+            'name' => 'sometimes|string|max:255',
+            'email' => [
                 'sometimes',
                 'email',
-                Rule::unique('users', 'email')->ignore($userId),
+                Rule::unique('users', 'email')->ignore($user->id),
             ],
-            'password' => 'sometimes|string|min:8|confirmed',
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
+            'current_password' => $isSelfUpdate
+                ? ['required_with:password', 'string', 'current_password']
+                : ['sometimes', 'string'],
         ];
     }
 }

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TodoGroup;
-use App\Services\TodoGroupService;
-use App\Http\Resources\TodoGroupResource;
 use App\Http\Requests\TodoGroup\StoreTodoGroupRequest;
 use App\Http\Requests\TodoGroup\UpdateTodoGroupRequest;
+use App\Http\Resources\TodoGroupResource;
+use App\Models\TodoGroup;
+use App\Services\TodoGroupService;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class TodoGroupController extends Controller
 {
@@ -29,7 +30,19 @@ class TodoGroupController extends Controller
         return TodoGroupResource::collection($todoGroups);
     }
 
-    /** 
+    /**
+     * List all archived TodoGroups belonging to the authenticated user
+     */
+    public function archived(): ResourceCollection
+    {
+        $this->authorize('viewAny', TodoGroup::class);
+
+        $todoGroups = $this->todoGroupService->getArchivedTodoGroups(auth()->id());
+
+        return TodoGroupResource::collection($todoGroups);
+    }
+
+    /**
      * Store a new TodoGroup
      */
     public function store(StoreTodoGroupRequest $request)
@@ -82,6 +95,18 @@ class TodoGroupController extends Controller
     }
 
     /**
+     * Unarchive a TodoGroup
+     */
+    public function unarchive(TodoGroup $todoGroup)
+    {
+        $this->authorize('unarchive', $todoGroup);
+
+        $todoGroup = $this->todoGroupService->unarchiveTodoGroup($todoGroup);
+
+        return new TodoGroupResource($todoGroup);
+    }
+
+    /**
      * Toggle pin state of a TodoGroup
      */
     public function togglePin(TodoGroup $todoGroup)
@@ -103,7 +128,7 @@ class TodoGroupController extends Controller
         $this->todoGroupService->deleteTodoGroup($todoGroup);
 
         return response()->json([
-            'message' => 'TodoGroup deleted successfully'
+            'message' => 'TodoGroup deleted successfully',
         ]);
     }
 }

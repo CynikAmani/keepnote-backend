@@ -22,6 +22,19 @@ class TodoGroupService
     }
 
     /**
+     * Retrieve all archived TodoGroups belonging to a user
+     */
+    public function getArchivedTodoGroups(int $userId): Collection
+    {
+        return TodoGroup::archived()
+            ->forUser($userId)
+            ->with('todoItems')
+            ->orderByDesc('is_pinned')
+            ->latest()
+            ->get();
+    }
+
+    /**
      * Create a new TodoGroup with optional TodoItems: one request - good practice for atomic operations and reduces client-server round trips
      */
     public function createTodoGroup(array $data): TodoGroup
@@ -32,7 +45,7 @@ class TodoGroupService
 
             $todoGroup = TodoGroup::create($data);
 
-            if (!empty($items)) {
+            if (! empty($items)) {
                 $todoGroup->todoItems()->createMany($items);
             }
 
@@ -63,12 +76,24 @@ class TodoGroupService
     }
 
     /**
+     * Unarchive a TodoGroup
+     */
+    public function unarchiveTodoGroup(TodoGroup $todoGroup): TodoGroup
+    {
+        $todoGroup->update([
+            'is_archived' => false,
+        ]);
+
+        return $todoGroup->load('todoItems');
+    }
+
+    /**
      * Toggle pin state of a TodoGroup
      */
     public function toggleTodoGroupPin(TodoGroup $todoGroup): TodoGroup
     {
         $todoGroup->update([
-            'is_pinned' => !$todoGroup->is_pinned,
+            'is_pinned' => ! $todoGroup->is_pinned,
         ]);
 
         return $todoGroup->load('todoItems');

@@ -98,11 +98,13 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     // --- TodoGroups ---
     Route::prefix('todo-groups')->group(function () {
         Route::get('/', [TodoGroupController::class, 'index'])->middleware('permission:view-todo-groups');
+        Route::get('/archived', [TodoGroupController::class, 'archived'])->middleware('permission:view-todo-groups');
         Route::get('/{todoGroup}', [TodoGroupController::class, 'show'])->middleware('permission:view-todo-groups');
         Route::post('/', [TodoGroupController::class, 'store'])->middleware('permission:create-todo-group');
         Route::put('/{todoGroup}', [TodoGroupController::class, 'update'])->middleware('permission:update-todo-group');
         Route::delete('/{todoGroup}', [TodoGroupController::class, 'destroy'])->middleware('permission:delete-todo-group');
         Route::patch('/{todoGroup}/archive', [TodoGroupController::class, 'archive'])->middleware('permission:update-todo-group');
+        Route::patch('/{todoGroup}/unarchive', [TodoGroupController::class, 'unarchive'])->middleware('permission:update-todo-group');
         Route::patch('/{todoGroup}/toggle-pin', [TodoGroupController::class, 'togglePin'])->middleware('permission:update-todo-group');
 
         // Batch Items
